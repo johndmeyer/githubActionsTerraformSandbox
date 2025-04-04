@@ -1,0 +1,19 @@
+name: sandbox
+run-name: Running sandbox
+
+on:
+  workflow_dispatch:
+    inputs:
+      sandbox_name:
+        description: 'Name of the sandbox'
+        required: true
+        default: 'sandbox'
+      sandbox_image:
+        description: 'Sandbox image name'
+        required: true
+        default: 'sandbox-image'
+      sandbox_command:
+        description: 'Command to run in the sandbox'
+        required: true
+        default: 'echo Hello, World!'
+        
