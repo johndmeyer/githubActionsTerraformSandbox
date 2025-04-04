@@ -16,4 +16,19 @@ on:
         description: 'Command to run in the sandbox'
         required: true
         default: 'echo Hello, World!'
-        
+
+jobs:
+  that-thing:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Run sandbox
+        run: |
+          echo "Running sandbox with name: ${{ github.event.inputs.sandbox_name }}"
+          echo "Using image: ${{ github.event.inputs.sandbox_image }}"
+          echo "Command to run: ${{ github.event.inputs.sandbox_command }}"
+          # Here you would add the actual command to run the sandbox
+          # For example, using Docker:
+          # docker run --name ${{ github.event.inputs.sandbox_name }} ${{ github.event.inputs.sandbox_image }} ${{ github.event.inputs.sandbox_command }}
