@@ -1,24 +1,76 @@
 name: sandbox
-run-name: Running sandbox
+run-name: ${{ github.actor }} is running sandbox
 
 on:
   workflow_dispatch:
     inputs:
-      sandbox_name:
-        description: 'Name of the sandbox'
+      terraform_action:
+        description: 'Terraform action to perform'
         required: true
-        default: 'sandbox'
-      sandbox_image:
-        description: 'Sandbox image name'
-        required: true
-        default: 'sandbox-image'
-      sandbox_command:
-        description: 'Command to run in the sandbox'
-        required: true
-        default: 'echo Hello, World!'
+        default: 'plan'
+        options:
+          - plan
+          - apply
+          - destroy
 
 jobs:
-  that-thing:
+  that_thing:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
+      - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
+      - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
+      - name: Check out repository code
+        uses: actions/checkout@v4
+      - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
+      - run: echo "🖥️ The workflow is now ready to test your code on the runner."
+      - name: List files in the repository
+        run: |
+          ls ${{ github.workspace }}
+      - run: echo "🍏 This job's status is ${{ job.status }}."
+
+  checkout_code:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+  get_env_vars:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up environment
+        run: |
+          echo "Setting up environment for action: ${{ github.event.inputs.terraform_action }}"
+          # Here you would add the actual command to set up the environment
+          # For example, installing dependencies or setting environment variables
+  build_docker_image:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build Docker image
+        run: |
+          echo "Building Docker image for action: ${{ github.event.inputs.terraform_action }}"
+          # Here you would add the actual command to build the Docker image
+          # For example, using Docker:
+          # docker build -t my-docker-image .
+  tag_docker_image:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Tag Docker image
+        run: |
+          echo "Tagging Docker image for action: ${{ github.event.inputs.terraform_action }}"
+          # Here you would add the actual command to tag the Docker image
+          # For example, using Docker:
+          # docker tag my-docker-image my-docker-image:${{ github.event.inputs.terraform_action }}
+  push_docker_image:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Push Docker image
+        run: |
+          echo "Pushing Docker image for action: ${{ github.event.inputs.terraform_action }}"
+          # Here you would add the actual command to push the Docker image
+          # For example, using Docker:
+          # docker push my-docker-image
+  invoke_terraform:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
