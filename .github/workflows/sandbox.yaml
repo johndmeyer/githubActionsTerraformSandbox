@@ -29,36 +29,27 @@ permissions:
   contents: read
 
 jobs:
-  checkout_code:
+  build_image:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
       - run: echo "The ${{ github.repository }} repository has been cloned to the runner."
+
       - name: List files in the repository
         run: |
           ls ${{ github.workspace }}
-      - run: echo "The workflow is now ready to use your code on the runner."
 
-  build_docker_image:
-    runs-on: ubuntu-latest
-    steps:
       - name: Build Docker image
         run: |
           echo "Building Docker image '${{ env.IMAGE_NAME }}'"
           docker build -t ${{ env.IMAGE_NAME }} .
 
-  tag_docker_image:
-    runs-on: ubuntu-latest
-    steps:
       - name: Tag Docker image
         run: |
           echo "Tagging Docker image '${{ env.IMAGE_NAME }}' with ecr"
           docker tag ${{ env.IMAGE_NAME }}:latest ${{ env.ECR_REGISTRY }}:latest
 
-  push_docker_image:
-    runs-on: ubuntu-latest
-    steps:
       - name: Get auth token from AWS
         run: |
           echo "Getting auth token from AWS"
@@ -69,6 +60,7 @@ jobs:
           docker push my-docker-image ${{ env.ECR_REGISTRY }}:latest
 
   invoke_terraform:
+    needs: [build_image]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
