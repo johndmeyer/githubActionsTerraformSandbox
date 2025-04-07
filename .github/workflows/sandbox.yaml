@@ -64,7 +64,7 @@ jobs:
       - name: Push Docker image
         run: |
           echo "Pushing Docker image"
-          docker push my-docker-image ${{ env.ECR_REGISTRY }}:latest
+          docker push ${{ env.ECR_REGISTRY }}:latest
 
   invoke_terraform:
     needs: [build_image]
