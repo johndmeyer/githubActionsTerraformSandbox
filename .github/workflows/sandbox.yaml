@@ -13,63 +13,61 @@ on:
           - apply
           - destroy
 
-jobs:
-  that_thing:
-    runs-on: ubuntu-latest
-    steps:
-      - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
-      - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
-      - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
-      - name: Check out repository code
-        uses: actions/checkout@v4
-      - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
-      - run: echo "🖥️ The workflow is now ready to test your code on the runner."
-      - name: List files in the repository
-        run: |
-          ls ${{ github.workspace }}
-      - run: echo "🍏 This job's status is ${{ job.status }}."
+env:
+  AWS_REGION: MY_AWS_REGION                   # set this to your preferred AWS region, e.g. us-west-1
+  ECR_REPOSITORY: MY_ECR_REPOSITORY           # set this to your Amazon ECR repository name
+  ECS_SERVICE: MY_ECS_SERVICE                 # set this to your Amazon ECS service name
+  ECS_CLUSTER: MY_ECS_CLUSTER                 # set this to your Amazon ECS cluster name
+  ECS_TASK_DEFINITION: MY_ECS_TASK_DEFINITION # set this to the path to your Amazon ECS task definition
+                                               # file, e.g. .aws/task-definition.json
+  CONTAINER_NAME: MY_CONTAINER_NAME           # set this to the name of the container in the
+                                               # containerDefinitions section of your task definition
+  IMAGE_NAME: image-${{ github.repository }}
+  ECR_REGISTRY: public.ecr.aws/o8k8h0m1/tf-sandbox
 
+permissions:
+  contents: read
+
+jobs:
   checkout_code:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-  get_env_vars:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Set up environment
+      - run: echo "The ${{ github.repository }} repository has been cloned to the runner."
+      - name: List files in the repository
         run: |
-          echo "Setting up environment for action: ${{ github.event.inputs.terraform_action }}"
-          # Here you would add the actual command to set up the environment
-          # For example, installing dependencies or setting environment variables
+          ls ${{ github.workspace }}
+      - run: echo "The workflow is now ready to use your code on the runner."
+
   build_docker_image:
     runs-on: ubuntu-latest
     steps:
       - name: Build Docker image
         run: |
-          echo "Building Docker image for action: ${{ github.event.inputs.terraform_action }}"
-          # Here you would add the actual command to build the Docker image
-          # For example, using Docker:
-          # docker build -t my-docker-image .
+          echo "Building Docker image '${{ env.IMAGE_NAME }}'"
+          docker build -t ${{ env.IMAGE_NAME }} .
+
   tag_docker_image:
     runs-on: ubuntu-latest
     steps:
       - name: Tag Docker image
         run: |
-          echo "Tagging Docker image for action: ${{ github.event.inputs.terraform_action }}"
-          # Here you would add the actual command to tag the Docker image
-          # For example, using Docker:
-          # docker tag my-docker-image my-docker-image:${{ github.event.inputs.terraform_action }}
+          echo "Tagging Docker image '${{ env.IMAGE_NAME }}' with ecr"
+          docker tag ${{ env.IMAGE_NAME }}:latest ${{ env.ECR_REGISTRY }}:latest
+
   push_docker_image:
     runs-on: ubuntu-latest
     steps:
+      - name: Get auth token from AWS
+        run: |
+          echo "Getting auth token from AWS"
+          aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${{ env.ECR_REGISTRY }}
       - name: Push Docker image
         run: |
-          echo "Pushing Docker image for action: ${{ github.event.inputs.terraform_action }}"
-          # Here you would add the actual command to push the Docker image
-          # For example, using Docker:
-          # docker push my-docker-image
+          echo "Pushing Docker image"
+          docker push my-docker-image ${{ env.ECR_REGISTRY }}:latest
+
   invoke_terraform:
     runs-on: ubuntu-latest
     steps:
