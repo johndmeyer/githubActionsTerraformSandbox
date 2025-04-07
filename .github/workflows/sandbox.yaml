@@ -22,7 +22,7 @@ env:
                                                # file, e.g. .aws/task-definition.json
   CONTAINER_NAME: MY_CONTAINER_NAME           # set this to the name of the container in the
                                                # containerDefinitions section of your task definition
-  IMAGE_NAME: image-${{ github.repository }}
+  IMAGE_NAME: image-gh-tf-sandbox
   ECR_REGISTRY: public.ecr.aws/o8k8h0m1/tf-sandbox
 
 permissions:
