@@ -72,7 +72,7 @@ jobs:
 
     - name: log response
       run: |
-        echo ${{ steps.login-ecr.outputs }}
+        echo ${{ steps.login-ecr.outputs.registry }}
 
     - name: Build, tag, and push image to Amazon ECR
       id: build-image
