@@ -14,14 +14,14 @@ on:
           - destroy
 
 env:
-  AWS_REGION: MY_AWS_REGION                   # set this to your preferred AWS region, e.g. us-west-1
+  AWS_REGION: us-east-1                       # set this to your preferred AWS region, e.g. us-west-1
   ECR_REPOSITORY: MY_ECR_REPOSITORY           # set this to your Amazon ECR repository name
   ECS_SERVICE: MY_ECS_SERVICE                 # set this to your Amazon ECS service name
   ECS_CLUSTER: MY_ECS_CLUSTER                 # set this to your Amazon ECS cluster name
   ECS_TASK_DEFINITION: MY_ECS_TASK_DEFINITION # set this to the path to your Amazon ECS task definition
-                                               # file, e.g. .aws/task-definition.json
+                                              # file, e.g. .aws/task-definition.json
   CONTAINER_NAME: MY_CONTAINER_NAME           # set this to the name of the container in the
-                                               # containerDefinitions section of your task definition
+                                             # containerDefinitions section of your task definition
   IMAGE_NAME: image-gh-tf-sandbox
   ECR_REGISTRY: public.ecr.aws/o8k8h0m1/tf-sandbox
 
@@ -50,10 +50,17 @@ jobs:
           echo "Tagging Docker image '${{ env.IMAGE_NAME }}' with ecr"
           docker tag ${{ env.IMAGE_NAME }}:latest ${{ env.ECR_REGISTRY }}:latest
 
-      - name: Get auth token from AWS
-        run: |
-          echo "Getting auth token from AWS"
-          aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${{ env.ECR_REGISTRY }}
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
       - name: Push Docker image
         run: |
           echo "Pushing Docker image"
