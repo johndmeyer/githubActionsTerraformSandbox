@@ -32,7 +32,7 @@ on:
 
 env:
   AWS_REGION: us-east-1
-  ECR_REGISTRY: public.ecr.aws/o8k8h0m1
+  #ECR_REGISTRY: public.ecr.aws/o8k8h0m1
   ECR_REPOSITORY: tf-sandbox
   #ECS_SERVICE: MY_ECS_SERVICE                 # set this to your Amazon ECS service name
   #ECS_CLUSTER: MY_ECS_CLUSTER                 # set this to your Amazon ECS cluster name
