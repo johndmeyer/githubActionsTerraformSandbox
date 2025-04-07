@@ -64,7 +64,7 @@ jobs:
 
     - name: log response
       run: |
-        echo ${{ steps.configure-aws.outputs }}
+        ls ${{ steps.configure-aws.outputs }}
 
     - name: Login to Amazon ECR
       id: login-ecr
