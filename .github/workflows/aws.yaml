@@ -62,9 +62,9 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: ${{ env.AWS_REGION }} 
 
-    - name: log response
-      run: |
-        ls ${{ steps.configure-aws.outputs }}
+    # - name: log response
+    #   run: |
+    #    ls ${{ steps.configure-aws.outputs }}
 
     - name: Login to Amazon ECR
       id: login-ecr
